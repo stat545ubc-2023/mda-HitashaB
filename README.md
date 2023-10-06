@@ -1,1 +1,2 @@
-# mda-project-template
+## Mini Data Analysis Project for STAT545A
+This is the Mini Data Analysis Project for STAT545A. There will be 2 Milestones for this project. Milestone 1 will familiarize me with working with my choice of dataset and using my knowledge of dplyr and ggplot functions. This README file is meant to provide context and instructions for this project folder; think of it lke a preface for what to expect. For Milestone 1, I have 3 main files, a .rmd file, a .md file, and another file that contains the graphs. Code from this repository is written in R and can be run in Rstudio. To execute RMarkdown files, you need to have installed R and RStudio. You will also need to install the datateachr package before proceeding.
