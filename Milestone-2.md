@@ -1,0 +1,955 @@
+Mini Data Analysis Milestone 2
+================
+
+*To complete this milestone, you can either edit [this `.rmd`
+file](https://raw.githubusercontent.com/UBC-STAT/stat545.stat.ubc.ca/master/content/mini-project/mini-project-2.Rmd)
+directly. Fill in the sections that are commented out with
+`<!--- start your work here--->`. When you are done, make sure to knit
+to an `.md` file by changing the output in the YAML header to
+`github_document`, before submitting a tagged release on canvas.*
+
+# Welcome to the rest of your mini data analysis project!
+
+In Milestone 1, you explored your data. and came up with research
+questions. This time, we will finish up our mini data analysis and
+obtain results for your data by:
+
+- Making summary tables and graphs
+- Manipulating special data types in R: factors and/or dates and times.
+- Fitting a model object to your data, and extract a result.
+- Reading and writing data as separate files.
+
+We will also explore more in depth the concept of *tidy data.*
+
+**NOTE**: The main purpose of the mini data analysis is to integrate
+what you learn in class in an analysis. Although each milestone provides
+a framework for you to conduct your analysis, it’s possible that you
+might find the instructions too rigid for your data set. If this is the
+case, you may deviate from the instructions – just make sure you’re
+demonstrating a wide range of tools and techniques taught in this class.
+
+# Instructions
+
+**To complete this milestone**, edit [this very `.Rmd`
+file](https://raw.githubusercontent.com/UBC-STAT/stat545.stat.ubc.ca/master/content/mini-project/mini-project-2.Rmd)
+directly. Fill in the sections that are tagged with
+`<!--- start your work here--->`.
+
+**To submit this milestone**, make sure to knit this `.Rmd` file to an
+`.md` file by changing the YAML output settings from
+`output: html_document` to `output: github_document`. Commit and push
+all of your work to your mini-analysis GitHub repository, and tag a
+release on GitHub. Then, submit a link to your tagged release on canvas.
+
+**Points**: This milestone is worth 50 points: 45 for your analysis, and
+5 for overall reproducibility, cleanliness, and coherence of the Github
+submission.
+
+**Research Questions**: In Milestone 1, you chose two research questions
+to focus on. Wherever realistic, your work in this milestone should
+relate to these research questions whenever we ask for justification
+behind your work. In the case that some tasks in this milestone don’t
+align well with one of your research questions, feel free to discuss
+your results in the context of a different research question.
+
+# Learning Objectives
+
+By the end of this milestone, you should:
+
+- Understand what *tidy* data is, and how to create it using `tidyr`.
+- Generate a reproducible and clear report using R Markdown.
+- Manipulating special data types in R: factors and/or dates and times.
+- Fitting a model object to your data, and extract a result.
+- Reading and writing data as separate files.
+
+# Setup
+
+Begin by loading your data and the tidyverse package below:
+
+``` r
+library(datateachr) # <- might contain the data you picked!
+library(tidyverse)
+```
+
+# Task 1: Process and summarize your data
+
+From milestone 1, you should have an idea of the basic structure of your
+dataset (e.g. number of rows and columns, class types, etc.). Here, we
+will start investigating your data more in-depth using various data
+manipulation functions.
+
+### 1.1 (1 point)
+
+First, write out the 4 research questions you defined in milestone 1
+were. This will guide your work through milestone 2:
+
+<!-------------------------- Start your work below ---------------------------->
+
+1.  *Does the mean radius size of nuclei present in the sample impact
+    the diagnosis of the tissue (i.e. does it impact malignancy)?*
+2.  *Are any of the variables positively or negatively correlated with
+    malignancy?*
+3.  *Does the mean fractal dimension of the nuclei in the sample impact
+    the malignancy diagnosis?*
+4.  *Can the mean fractal dimension predict the mean radius size of the
+    nuclei present in the image, does an increase in fractal dimension
+    result in an increase in radius size?*
+    <!----------------------------------------------------------------------------->
+
+Here, we will investigate your data using various data manipulation and
+graphing functions.
+
+### 1.2 (8 points)
+
+Now, for each of your four research questions, choose one task from
+options 1-4 (summarizing), and one other task from 4-8 (graphing). You
+should have 2 tasks done for each research question (8 total). Make sure
+it makes sense to do them! (e.g. don’t use a numerical variables for a
+task that needs a categorical variable.). Comment on why each task helps
+(or doesn’t!) answer the corresponding research question.
+
+Ensure that the output of each operation is printed!
+
+Also make sure that you’re using dplyr and ggplot2 rather than base R.
+Outside of this project, you may find that you prefer using base R
+functions for certain tasks, and that’s just fine! But part of this
+project is for you to practice the tools we learned in class, which is
+dplyr and ggplot2.
+
+**Summarizing:**
+
+1.  Compute the *range*, *mean*, and *two other summary statistics* of
+    **one numerical variable** across the groups of **one categorical
+    variable** from your data.
+2.  Compute the number of observations for at least one of your
+    categorical variables. Do not use the function `table()`!
+3.  Create a categorical variable with 3 or more groups from an existing
+    numerical variable. You can use this new variable in the other
+    tasks! *An example: age in years into “child, teen, adult, senior”.*
+4.  Compute the proportion and counts in each category of one
+    categorical variable across the groups of another categorical
+    variable from your data. Do not use the function `table()`!
+
+**Graphing:**
+
+6.  Create a graph of your choosing, make one of the axes logarithmic,
+    and format the axes labels so that they are “pretty” or easier to
+    read.
+7.  Make a graph where it makes sense to customize the alpha
+    transparency.
+
+Using variables and/or tables you made in one of the “Summarizing”
+tasks:
+
+8.  Create a graph that has at least two geom layers.
+9.  Create 3 histograms, with each histogram having different sized
+    bins. Pick the “best” one and explain why it is the best.
+
+Make sure it’s clear what research question you are doing each operation
+for!
+
+<!------------------------- Start your work below ----------------------------->
+
+Research question 1: Does the mean radius size of nuclei present in the
+sample impact the diagnosis of the tissue (i.e. does it impact
+malignancy)?
+
+``` r
+observations <- cancer_sample %>% count(diagnosis) 
+print(observations)
+```
+
+    ## # A tibble: 2 × 2
+    ##   diagnosis     n
+    ##   <chr>     <int>
+    ## 1 B           357
+    ## 2 M           212
+
+``` r
+ggplot(cancer_sample, aes(x=radius_mean))+
+  geom_density (aes(fill=diagnosis, alpha=0.8))+
+  scale_fill_manual(values=c("B"="cyan","M"="red"))
+```
+
+![](Milestone-2_files/figure-gfm/unnamed-chunk-3-1.png)<!-- --> For
+research question 1, I chose **task 2** as it helps me get an idea of
+how many observations there are for each type of diagnosis. However, it
+does not directly contribute towards answering the research question.
+**Task 7** allows me to see how much overlap there is between the mean
+nuclei radius and diagnosis. I see 2 peaks for the mean radius of nuclei
+in malignant masses, this means there may be 2 frequently occurring
+values. Alpha transparency in this case makes the curves slightly
+transparent so that the overlap can be seen more clearly.
+
+Research question 2: Are any of the variables positively or negatively
+correlated with malignancy?
+
+``` r
+radius_stats <- cancer_sample %>% 
+  select(diagnosis, radius_mean) %>% 
+  group_by(diagnosis) %>%
+  summarise(.groups = "keep",
+            min = min(radius_mean),
+            mean = mean(radius_mean),
+            median = median(radius_mean),
+            max = max(radius_mean),
+            range = max-min,
+            stdev = sd(radius_mean)) #standard deviation
+print(radius_stats)
+```
+
+    ## # A tibble: 2 × 7
+    ## # Groups:   diagnosis [2]
+    ##   diagnosis   min  mean median   max range stdev
+    ##   <chr>     <dbl> <dbl>  <dbl> <dbl> <dbl> <dbl>
+    ## 1 B          6.98  12.1   12.2  17.8  10.9  1.78
+    ## 2 M         11.0   17.5   17.3  28.1  17.2  3.20
+
+``` r
+variable_stats <- cancer_sample %>%
+group_by(diagnosis) %>%
+summarise(across (where(is.numeric),
+mean, na.rm=TRUE),
+n=n())
+```
+
+    ## Warning: There was 1 warning in `summarise()`.
+    ## ℹ In argument: `across(where(is.numeric), mean, na.rm = TRUE)`.
+    ## ℹ In group 1: `diagnosis = "B"`.
+    ## Caused by warning:
+    ## ! The `...` argument of `across()` is deprecated as of dplyr 1.1.0.
+    ## Supply arguments directly to `.fns` through an anonymous function instead.
+    ## 
+    ##   # Previously
+    ##   across(a:b, mean, na.rm = TRUE)
+    ## 
+    ##   # Now
+    ##   across(a:b, \(x) mean(x, na.rm = TRUE))
+
+``` r
+print(variable_stats)
+```
+
+    ## # A tibble: 2 × 33
+    ##   diagnosis        ID radius_mean texture_mean perimeter_mean area_mean
+    ##   <chr>         <dbl>       <dbl>        <dbl>          <dbl>     <dbl>
+    ## 1 B         26543825.        12.1         17.9           78.1      463.
+    ## 2 M         36818050.        17.5         21.6          115.       978.
+    ## # ℹ 27 more variables: smoothness_mean <dbl>, compactness_mean <dbl>,
+    ## #   concavity_mean <dbl>, concave_points_mean <dbl>, symmetry_mean <dbl>,
+    ## #   fractal_dimension_mean <dbl>, radius_se <dbl>, texture_se <dbl>,
+    ## #   perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
+    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
+    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>,
+    ## #   texture_worst <dbl>, perimeter_worst <dbl>, area_worst <dbl>, …
+
+``` r
+ggplot(cancer_sample, aes(x=radius_mean, y=fractal_dimension_mean, colour=diagnosis)) +
+  geom_point(alpha = 0.8)+
+  geom_smooth(se=F, colour="black")
+```
+
+    ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+![](Milestone-2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- --> For
+research question 2, I chose to do **task 1** because it helps me gain a
+better understanding of different parameters and summary statistics of
+the nuclei radius mean size for each diagnosis. I chose to look at this
+variable because I think it may be correlated with the diagnosis
+received. I also chose to summarise across all variables to see the
+means of each. This was helpful as it showed me which variables might be
+the most different between benign and malignant breast masses. I chose
+to do **task 8** because this plot lets me explore and visualize the
+relationship between fractal dimension mean, radius size and diagnosis.
+Layering these visualizations gives me an initial look into whether
+these variables may be related in a linear fashion before running a
+linear regression.
+
+Research question 3: Does the mean fractal dimension of the nuclei in
+the sample impact the malignancy diagnosis?
+
+``` r
+nuclei_fractal_dimension_stats <- cancer_sample %>%
+select(diagnosis, fractal_dimension_mean) %>% #picking radius mean vs. diagnosis
+group_by(diagnosis) %>%
+summarise(.groups = "keep",
+min = min(fractal_dimension_mean),
+Q1 = quantile(fractal_dimension_mean, 0.25), #1st quartile
+mean = mean(fractal_dimension_mean),
+median = median(fractal_dimension_mean),
+Q3 = quantile(fractal_dimension_mean, 0.75), #3rd quartile
+max = max(fractal_dimension_mean),
+range = max-min,
+stdev = sd(fractal_dimension_mean)) #standard deviation
+print(nuclei_fractal_dimension_stats)
+```
+
+    ## # A tibble: 2 × 9
+    ## # Groups:   diagnosis [2]
+    ##   diagnosis    min     Q1   mean median     Q3    max  range   stdev
+    ##   <chr>      <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>  <dbl>   <dbl>
+    ## 1 B         0.0518 0.0585 0.0629 0.0615 0.0658 0.0958 0.0439 0.00675
+    ## 2 M         0.0500 0.0566 0.0627 0.0616 0.0671 0.0974 0.0475 0.00757
+
+``` r
+ggplot(cancer_sample, aes (diagnosis, fractal_dimension_mean))+geom_jitter(alpha=0.5, width=0.1)+
+  ylab("Nuclei Fractal Dimension Mean")+
+  xlab("Diagnosis")+
+  scale_y_log10()
+```
+
+![](Milestone-2_files/figure-gfm/unnamed-chunk-8-1.png)<!-- --> For
+research question 3, I chose to do **task 1** to gain further insight
+into different summary statistics and parameters of a different variable
+I think might be correlated with diagnosis. This aids in answering the
+question of whether fractal dimension of nuclei impacts malignancy by
+allowing me to see the summary statistics between diagnoses. I chose
+**task 6** for graphing because a jitter geom allows for each data point
+to be seen. **Using alpha** in the code allows for some transparency in
+the data points and **width** allows for the points in the plot to not
+jitter too far away from each other. I also used a **logarithmic scale**
+to plot the data, but since the values are very small it is less
+apparent.
+
+Research question 4: Can the mean fractal dimension predict the mean
+radius size of the nuclei present in the image, does an increase in
+fractal dimension result in an increase in radius size?
+
+``` r
+cancer_sample <- cancer_sample %>%
+  mutate(radius_mean_category=case_when(
+    radius_mean <= 8 ~ "Small",
+    radius_mean <= 15 ~ "Medium",
+TRUE~"Large"
+  ))
+print(cancer_sample)
+```
+
+    ## # A tibble: 569 × 33
+    ##          ID diagnosis radius_mean texture_mean perimeter_mean area_mean
+    ##       <dbl> <chr>           <dbl>        <dbl>          <dbl>     <dbl>
+    ##  1   842302 M                18.0         10.4          123.      1001 
+    ##  2   842517 M                20.6         17.8          133.      1326 
+    ##  3 84300903 M                19.7         21.2          130       1203 
+    ##  4 84348301 M                11.4         20.4           77.6      386.
+    ##  5 84358402 M                20.3         14.3          135.      1297 
+    ##  6   843786 M                12.4         15.7           82.6      477.
+    ##  7   844359 M                18.2         20.0          120.      1040 
+    ##  8 84458202 M                13.7         20.8           90.2      578.
+    ##  9   844981 M                13           21.8           87.5      520.
+    ## 10 84501001 M                12.5         24.0           84.0      476.
+    ## # ℹ 559 more rows
+    ## # ℹ 27 more variables: smoothness_mean <dbl>, compactness_mean <dbl>,
+    ## #   concavity_mean <dbl>, concave_points_mean <dbl>, symmetry_mean <dbl>,
+    ## #   fractal_dimension_mean <dbl>, radius_se <dbl>, texture_se <dbl>,
+    ## #   perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
+    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
+    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>, …
+
+``` r
+ggplot(cancer_sample, aes(x=fractal_dimension_mean))+
+  geom_density (aes(fill=radius_mean_category, alpha=0.8))
+```
+
+![](Milestone-2_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+For research question 4, I chose to do **task 3** to create a new
+variable where the numeric variable of radius mean is transformed into a
+categorical variable. I am able to classify the radius mean size as
+either small, medium or large. I chose graphing **task 7** to plot the
+density of the mean fractal dimension for each category of radius size.
+Multiple densities in a single plot work well with a smaller number of
+categories (i.e. radius mean category - small, medium or large). Here, I
+am able see whether larger fractal dimensions are present in nuclei with
+a larger mean radius. This plot also provides insight into the
+distribution of the data which would be otherwise harder to see in a
+table. **Fill** allows for the curves to be colored based on the radius
+category. **Alpha** is included in the code to make the curves slightly
+transparent so that the overlap can be seen more clearly.
+<!----------------------------------------------------------------------------->
+
+### 1.3 (2 points)
+
+Based on the operations that you’ve completed, how much closer are you
+to answering your research questions? Think about what aspects of your
+research questions remain unclear. Can your research questions be
+refined, now that you’ve investigated your data a bit more? Which
+research questions are yielding interesting results?
+
+<!------------------------- Write your answer here ---------------------------->
+
+Based on the operations I ran above, I would say that I am much closer
+towards answering my research questions than I was prior to doing this.
+I was able to play around with the data and the variables to gain a
+deeper understanding of the relationships that are present. I do think
+that some of my research questions may have been too broad which makes
+it harder to properly summarise and graph the data to best fit the
+question. For broader research questions several plots may be required,
+and also more complicated analyses. The questions that are yielding
+interesting results are specific questions that I have asked. They are
+the ones that directly ask for the impact of on variable on another.
+This is in contrast to the question that asks if any of the variables
+are predictive of malignancy.
+
+<!----------------------------------------------------------------------------->
+
+# Task 2: Tidy your data
+
+In this task, we will do several exercises to reshape our data. The goal
+here is to understand how to do this reshaping with the `tidyr` package.
+
+A reminder of the definition of *tidy* data:
+
+- Each row is an **observation**
+- Each column is a **variable**
+- Each cell is a **value**
+
+### 2.1 (2 points)
+
+Based on the definition above, can you identify if your data is tidy or
+untidy? Go through all your columns, or if you have \>8 variables, just
+pick 8, and explain whether the data is untidy or tidy.
+
+<!--------------------------- Start your work below --------------------------->
+
+``` r
+head(cancer_sample)
+```
+
+    ## # A tibble: 6 × 33
+    ##         ID diagnosis radius_mean texture_mean perimeter_mean area_mean
+    ##      <dbl> <chr>           <dbl>        <dbl>          <dbl>     <dbl>
+    ## 1   842302 M                18.0         10.4          123.      1001 
+    ## 2   842517 M                20.6         17.8          133.      1326 
+    ## 3 84300903 M                19.7         21.2          130       1203 
+    ## 4 84348301 M                11.4         20.4           77.6      386.
+    ## 5 84358402 M                20.3         14.3          135.      1297 
+    ## 6   843786 M                12.4         15.7           82.6      477.
+    ## # ℹ 27 more variables: smoothness_mean <dbl>, compactness_mean <dbl>,
+    ## #   concavity_mean <dbl>, concave_points_mean <dbl>, symmetry_mean <dbl>,
+    ## #   fractal_dimension_mean <dbl>, radius_se <dbl>, texture_se <dbl>,
+    ## #   perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
+    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
+    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>,
+    ## #   texture_worst <dbl>, perimeter_worst <dbl>, area_worst <dbl>, …
+
+Data seems tidy as each row is an observation, each cell is a value and
+each column is a variable. ID is an identifier variable as it is the
+patient ID. Therefore, each row is a new observation from a different
+patient. Let’s investigate this further to double check.
+
+``` r
+colnames(cancer_sample)
+```
+
+    ##  [1] "ID"                      "diagnosis"              
+    ##  [3] "radius_mean"             "texture_mean"           
+    ##  [5] "perimeter_mean"          "area_mean"              
+    ##  [7] "smoothness_mean"         "compactness_mean"       
+    ##  [9] "concavity_mean"          "concave_points_mean"    
+    ## [11] "symmetry_mean"           "fractal_dimension_mean" 
+    ## [13] "radius_se"               "texture_se"             
+    ## [15] "perimeter_se"            "area_se"                
+    ## [17] "smoothness_se"           "compactness_se"         
+    ## [19] "concavity_se"            "concave_points_se"      
+    ## [21] "symmetry_se"             "fractal_dimension_se"   
+    ## [23] "radius_worst"            "texture_worst"          
+    ## [25] "perimeter_worst"         "area_worst"             
+    ## [27] "smoothness_worst"        "compactness_worst"      
+    ## [29] "concavity_worst"         "concave_points_worst"   
+    ## [31] "symmetry_worst"          "fractal_dimension_worst"
+    ## [33] "radius_mean_category"
+
+All of the columns are variables.
+
+``` r
+glimpse(cancer_sample)
+```
+
+    ## Rows: 569
+    ## Columns: 33
+    ## $ ID                      <dbl> 842302, 842517, 84300903, 84348301, 84358402, …
+    ## $ diagnosis               <chr> "M", "M", "M", "M", "M", "M", "M", "M", "M", "…
+    ## $ radius_mean             <dbl> 17.990, 20.570, 19.690, 11.420, 20.290, 12.450…
+    ## $ texture_mean            <dbl> 10.38, 17.77, 21.25, 20.38, 14.34, 15.70, 19.9…
+    ## $ perimeter_mean          <dbl> 122.80, 132.90, 130.00, 77.58, 135.10, 82.57, …
+    ## $ area_mean               <dbl> 1001.0, 1326.0, 1203.0, 386.1, 1297.0, 477.1, …
+    ## $ smoothness_mean         <dbl> 0.11840, 0.08474, 0.10960, 0.14250, 0.10030, 0…
+    ## $ compactness_mean        <dbl> 0.27760, 0.07864, 0.15990, 0.28390, 0.13280, 0…
+    ## $ concavity_mean          <dbl> 0.30010, 0.08690, 0.19740, 0.24140, 0.19800, 0…
+    ## $ concave_points_mean     <dbl> 0.14710, 0.07017, 0.12790, 0.10520, 0.10430, 0…
+    ## $ symmetry_mean           <dbl> 0.2419, 0.1812, 0.2069, 0.2597, 0.1809, 0.2087…
+    ## $ fractal_dimension_mean  <dbl> 0.07871, 0.05667, 0.05999, 0.09744, 0.05883, 0…
+    ## $ radius_se               <dbl> 1.0950, 0.5435, 0.7456, 0.4956, 0.7572, 0.3345…
+    ## $ texture_se              <dbl> 0.9053, 0.7339, 0.7869, 1.1560, 0.7813, 0.8902…
+    ## $ perimeter_se            <dbl> 8.589, 3.398, 4.585, 3.445, 5.438, 2.217, 3.18…
+    ## $ area_se                 <dbl> 153.40, 74.08, 94.03, 27.23, 94.44, 27.19, 53.…
+    ## $ smoothness_se           <dbl> 0.006399, 0.005225, 0.006150, 0.009110, 0.0114…
+    ## $ compactness_se          <dbl> 0.049040, 0.013080, 0.040060, 0.074580, 0.0246…
+    ## $ concavity_se            <dbl> 0.05373, 0.01860, 0.03832, 0.05661, 0.05688, 0…
+    ## $ concave_points_se       <dbl> 0.015870, 0.013400, 0.020580, 0.018670, 0.0188…
+    ## $ symmetry_se             <dbl> 0.03003, 0.01389, 0.02250, 0.05963, 0.01756, 0…
+    ## $ fractal_dimension_se    <dbl> 0.006193, 0.003532, 0.004571, 0.009208, 0.0051…
+    ## $ radius_worst            <dbl> 25.38, 24.99, 23.57, 14.91, 22.54, 15.47, 22.8…
+    ## $ texture_worst           <dbl> 17.33, 23.41, 25.53, 26.50, 16.67, 23.75, 27.6…
+    ## $ perimeter_worst         <dbl> 184.60, 158.80, 152.50, 98.87, 152.20, 103.40,…
+    ## $ area_worst              <dbl> 2019.0, 1956.0, 1709.0, 567.7, 1575.0, 741.6, …
+    ## $ smoothness_worst        <dbl> 0.1622, 0.1238, 0.1444, 0.2098, 0.1374, 0.1791…
+    ## $ compactness_worst       <dbl> 0.6656, 0.1866, 0.4245, 0.8663, 0.2050, 0.5249…
+    ## $ concavity_worst         <dbl> 0.71190, 0.24160, 0.45040, 0.68690, 0.40000, 0…
+    ## $ concave_points_worst    <dbl> 0.26540, 0.18600, 0.24300, 0.25750, 0.16250, 0…
+    ## $ symmetry_worst          <dbl> 0.4601, 0.2750, 0.3613, 0.6638, 0.2364, 0.3985…
+    ## $ fractal_dimension_worst <dbl> 0.11890, 0.08902, 0.08758, 0.17300, 0.07678, 0…
+    ## $ radius_mean_category    <chr> "Large", "Large", "Large", "Medium", "Large", …
+
+Each cell is a value. For diagnosis, the cells indicate either “M” or
+“B” for malignant or benign, respectively. This means that each cell is
+a value.
+
+Based on the definition, the cancer_sample dataset is **tidy.**
+<!----------------------------------------------------------------------------->
+
+### 2.2 (4 points)
+
+Now, if your data is tidy, untidy it! Then, tidy it back to it’s
+original state.
+
+If your data is untidy, then tidy it! Then, untidy it back to it’s
+original state.
+
+Be sure to explain your reasoning for this task. Show us the “before”
+and “after”.
+
+<!--------------------------- Start your work below --------------------------->
+
+``` r
+head(cancer_sample)
+```
+
+    ## # A tibble: 6 × 33
+    ##         ID diagnosis radius_mean texture_mean perimeter_mean area_mean
+    ##      <dbl> <chr>           <dbl>        <dbl>          <dbl>     <dbl>
+    ## 1   842302 M                18.0         10.4          123.      1001 
+    ## 2   842517 M                20.6         17.8          133.      1326 
+    ## 3 84300903 M                19.7         21.2          130       1203 
+    ## 4 84348301 M                11.4         20.4           77.6      386.
+    ## 5 84358402 M                20.3         14.3          135.      1297 
+    ## 6   843786 M                12.4         15.7           82.6      477.
+    ## # ℹ 27 more variables: smoothness_mean <dbl>, compactness_mean <dbl>,
+    ## #   concavity_mean <dbl>, concave_points_mean <dbl>, symmetry_mean <dbl>,
+    ## #   fractal_dimension_mean <dbl>, radius_se <dbl>, texture_se <dbl>,
+    ## #   perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
+    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
+    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>,
+    ## #   texture_worst <dbl>, perimeter_worst <dbl>, area_worst <dbl>, …
+
+``` r
+untidy_cancer_sample <- cancer_sample %>% 
+   pivot_longer(cols = c(-ID, -diagnosis, -radius_mean_category),
+                names_to = c("stat_type"), 
+                values_to = "measurement") 
+select(untidy_cancer_sample, stat_type, measurement, everything())
+```
+
+    ## # A tibble: 17,070 × 5
+    ##    stat_type              measurement     ID diagnosis radius_mean_category
+    ##    <chr>                        <dbl>  <dbl> <chr>     <chr>               
+    ##  1 radius_mean                18.0    842302 M         Large               
+    ##  2 texture_mean               10.4    842302 M         Large               
+    ##  3 perimeter_mean            123.     842302 M         Large               
+    ##  4 area_mean                1001      842302 M         Large               
+    ##  5 smoothness_mean             0.118  842302 M         Large               
+    ##  6 compactness_mean            0.278  842302 M         Large               
+    ##  7 concavity_mean              0.300  842302 M         Large               
+    ##  8 concave_points_mean         0.147  842302 M         Large               
+    ##  9 symmetry_mean               0.242  842302 M         Large               
+    ## 10 fractal_dimension_mean      0.0787 842302 M         Large               
+    ## # ℹ 17,060 more rows
+
+``` r
+head(untidy_cancer_sample)
+```
+
+    ## # A tibble: 6 × 5
+    ##       ID diagnosis radius_mean_category stat_type        measurement
+    ##    <dbl> <chr>     <chr>                <chr>                  <dbl>
+    ## 1 842302 M         Large                radius_mean           18.0  
+    ## 2 842302 M         Large                texture_mean          10.4  
+    ## 3 842302 M         Large                perimeter_mean       123.   
+    ## 4 842302 M         Large                area_mean           1001    
+    ## 5 842302 M         Large                smoothness_mean        0.118
+    ## 6 842302 M         Large                compactness_mean       0.278
+
+``` r
+tidy_cancer_sample<-untidy_cancer_sample%>%
+  pivot_wider(names_from = stat_type, values_from = measurement) %>% 
+  select(ID, diagnosis, radius_mean_category,everything())
+head(tidy_cancer_sample)
+```
+
+    ## # A tibble: 6 × 33
+    ##        ID diagnosis radius_mean_category radius_mean texture_mean perimeter_mean
+    ##     <dbl> <chr>     <chr>                      <dbl>        <dbl>          <dbl>
+    ## 1  8.42e5 M         Large                       18.0         10.4          123. 
+    ## 2  8.43e5 M         Large                       20.6         17.8          133. 
+    ## 3  8.43e7 M         Large                       19.7         21.2          130  
+    ## 4  8.43e7 M         Medium                      11.4         20.4           77.6
+    ## 5  8.44e7 M         Large                       20.3         14.3          135. 
+    ## 6  8.44e5 M         Medium                      12.4         15.7           82.6
+    ## # ℹ 27 more variables: area_mean <dbl>, smoothness_mean <dbl>,
+    ## #   compactness_mean <dbl>, concavity_mean <dbl>, concave_points_mean <dbl>,
+    ## #   symmetry_mean <dbl>, fractal_dimension_mean <dbl>, radius_se <dbl>,
+    ## #   texture_se <dbl>, perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
+    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
+    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>,
+    ## #   texture_worst <dbl>, perimeter_worst <dbl>, area_worst <dbl>, …
+
+<!----------------------------------------------------------------------------->
+
+### 2.3 (4 points)
+
+Now, you should be more familiar with your data, and also have made
+progress in answering your research questions. Based on your interest,
+and your analyses, pick 2 of the 4 research questions to continue your
+analysis in the remaining tasks:
+
+<!-------------------------- Start your work below ---------------------------->
+
+1.  *Question 1: Does mean nuclei radius size differ depending on
+    malignancy of the breast mass?*
+2.  *New Question 2: Which single variable is the best predictor of
+    malignancy is breast mass?*
+
+<!----------------------------------------------------------------------------->
+
+Explain your decision for choosing the above two research questions.
+
+<!--------------------------- Start your work below --------------------------->
+
+The reason why I chose these two questions is because they are specific
+and measurable. I am interested in seeing which single variable is
+important for diagnosis. These questions have yet to be answered but I
+believe I have gotten closer to the result through the plots and
+observations made with the data through the various exercises.
+<!----------------------------------------------------------------------------->
+
+Now, try to choose a version of your data that you think will be
+appropriate to answer these 2 questions. Use between 4 and 8 functions
+that we’ve covered so far (i.e. by filtering, cleaning, tidy’ing,
+dropping irrelevant columns, etc.).
+
+(If it makes more sense, then you can make/pick two versions of your
+data, one for each research question.)
+
+<!--------------------------- Start your work below --------------------------->
+
+``` r
+question_2_data<- cancer_sample %>%
+select(-c(ID)) %>%
+mutate(malignancy = case_when(diagnosis == "M" ~ 1, TRUE ~ 0)) %>%
+select(-diagnosis) %>%
+group_by(malignancy) %>%
+relocate (malignancy)
+head(question_2_data)
+```
+
+    ## # A tibble: 6 × 32
+    ## # Groups:   malignancy [1]
+    ##   malignancy radius_mean texture_mean perimeter_mean area_mean smoothness_mean
+    ##        <dbl>       <dbl>        <dbl>          <dbl>     <dbl>           <dbl>
+    ## 1          1        18.0         10.4          123.      1001           0.118 
+    ## 2          1        20.6         17.8          133.      1326           0.0847
+    ## 3          1        19.7         21.2          130       1203           0.110 
+    ## 4          1        11.4         20.4           77.6      386.          0.142 
+    ## 5          1        20.3         14.3          135.      1297           0.100 
+    ## 6          1        12.4         15.7           82.6      477.          0.128 
+    ## # ℹ 26 more variables: compactness_mean <dbl>, concavity_mean <dbl>,
+    ## #   concave_points_mean <dbl>, symmetry_mean <dbl>,
+    ## #   fractal_dimension_mean <dbl>, radius_se <dbl>, texture_se <dbl>,
+    ## #   perimeter_se <dbl>, area_se <dbl>, smoothness_se <dbl>,
+    ## #   compactness_se <dbl>, concavity_se <dbl>, concave_points_se <dbl>,
+    ## #   symmetry_se <dbl>, fractal_dimension_se <dbl>, radius_worst <dbl>,
+    ## #   texture_worst <dbl>, perimeter_worst <dbl>, area_worst <dbl>, …
+
+Here, I have removed the ID column as it does not provide information
+that will be useful. I have assigned diagnosis with a numeric value to
+help with correlation analysis. “M” is assigned a 1 and “B” is given a
+0. We, therefore, no longer need the diagnosis variable, so that has
+been removed too. The malignancy variable has also been moved to the
+front of the table so that it is easier to see.
+
+``` r
+question_1_data<- question_2_data %>%
+select(-c(contains("se"), contains("worst"), contains("category")))
+head(question_1_data)
+```
+
+    ## # A tibble: 6 × 11
+    ## # Groups:   malignancy [1]
+    ##   malignancy radius_mean texture_mean perimeter_mean area_mean smoothness_mean
+    ##        <dbl>       <dbl>        <dbl>          <dbl>     <dbl>           <dbl>
+    ## 1          1        18.0         10.4          123.      1001           0.118 
+    ## 2          1        20.6         17.8          133.      1326           0.0847
+    ## 3          1        19.7         21.2          130       1203           0.110 
+    ## 4          1        11.4         20.4           77.6      386.          0.142 
+    ## 5          1        20.3         14.3          135.      1297           0.100 
+    ## 6          1        12.4         15.7           82.6      477.          0.128 
+    ## # ℹ 5 more variables: compactness_mean <dbl>, concavity_mean <dbl>,
+    ## #   concave_points_mean <dbl>, symmetry_mean <dbl>,
+    ## #   fractal_dimension_mean <dbl>
+
+Here, I have removed columns containing “se”, “category” or “worst” in
+order to be able to focus on the means of the variables. This will help
+answer question 1 but also help with investigating the relationship with
+other mean variables and malignancy.
+
+# Task 3: Modelling
+
+## 3.0 (no points)
+
+Pick a research question from 1.2, and pick a variable of interest
+(we’ll call it “Y”) that’s relevant to the research question. Indicate
+these.
+
+<!-------------------------- Start your work below ---------------------------->
+
+**Research Question**: Does mean nuclei radius size differ depending on
+malignancy of the breast mass?
+
+**Variable of interest**: radius_mean
+
+<!----------------------------------------------------------------------------->
+
+## 3.1 (3 points)
+
+Fit a model or run a hypothesis test that provides insight on this
+variable with respect to the research question. Store the model object
+as a variable, and print its output to screen. We’ll omit having to
+justify your choice, because we don’t expect you to know about model
+specifics in STAT 545.
+
+- **Note**: It’s OK if you don’t know how these models/tests work. Here
+  are some examples of things you can do here, but the sky’s the limit.
+
+  - You could fit a model that makes predictions on Y using another
+    variable, by using the `lm()` function.
+  - You could test whether the mean of Y equals 0 using `t.test()`, or
+    maybe the mean across two groups are different using `t.test()`, or
+    maybe the mean across multiple groups are different using `anova()`
+    (you may have to pivot your data for the latter two).
+  - You could use `lm()` to test for significance of regression
+    coefficients.
+
+<!-------------------------- Start your work below ---------------------------->
+
+``` r
+data_test <- t.test(radius_mean ~ diagnosis, data=cancer_sample)
+print(data_test)
+```
+
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  radius_mean by diagnosis
+    ## t = -22.209, df = 289.71, p-value < 2.2e-16
+    ## alternative hypothesis: true difference in means between group B and group M is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -5.787448 -4.845165
+    ## sample estimates:
+    ## mean in group B mean in group M 
+    ##        12.14652        17.46283
+
+Running a t-test on the means of the radius_mean size of nuclei within
+each diagnosis allows me to answer the quesiton of whether radius_mean
+is different between the two groups. This code chunk allows me to see
+the p-value, df, and means of each group.
+<!----------------------------------------------------------------------------->
+
+## 3.2 (3 points)
+
+Produce something relevant from your fitted model: either predictions on
+Y, or a single value like a regression coefficient or a p-value.
+
+- Be sure to indicate in writing what you chose to produce.
+- Your code should either output a tibble (in which case you should
+  indicate the column that contains the thing you’re looking for), or
+  the thing you’re looking for itself.
+- Obtain your results using the `broom` package if possible. If your
+  model is not compatible with the broom function you’re needing, then
+  you can obtain your results by some other means, but first indicate
+  which broom function is not compatible.
+
+<!-------------------------- Start your work below ---------------------------->
+
+``` r
+library(broom)
+tidy_data_test<- tidy(data_test)
+print (data_test)
+```
+
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  radius_mean by diagnosis
+    ## t = -22.209, df = 289.71, p-value < 2.2e-16
+    ## alternative hypothesis: true difference in means between group B and group M is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -5.787448 -4.845165
+    ## sample estimates:
+    ## mean in group B mean in group M 
+    ##        12.14652        17.46283
+
+``` r
+#printing the p value
+data_test$p.value
+```
+
+    ## [1] 1.684459e-64
+
+``` r
+#printing the mean
+data_test$estimate
+```
+
+    ## mean in group B mean in group M 
+    ##        12.14652        17.46283
+
+Here I was able to load the broom package and use its t-test function. I
+have also printed the p-value and mean outputs from the analysis. With
+this, I can see that there is a significant difference of radius mean
+size between malignant and bengin masses.
+<!----------------------------------------------------------------------------->
+
+# Task 4: Reading and writing data
+
+Get set up for this exercise by making a folder called `output` in the
+top level of your project folder / repository. You’ll be saving things
+there.
+
+## 4.1 (3 points)
+
+Take a summary table that you made from Task 1, and write it as a csv
+file in your `output` folder. Use the `here::here()` function.
+
+- **Robustness criteria**: You should be able to move your Mini Project
+  repository / project folder to some other location on your computer,
+  or move this very Rmd file to another location within your project
+  repository / folder, and your code should still work.
+- **Reproducibility criteria**: You should be able to delete the csv
+  file, and remake it simply by knitting this Rmd file.
+
+<!-------------------------- Start your work below ---------------------------->
+
+``` r
+output_directory <- "output"
+file_name <- "milestone2_radius_summary.csv"
+write_csv(radius_stats, here::here(output_directory, file_name))
+```
+
+I have written this summary table to a file called
+milestone2_radius_summary.
+
+``` r
+test_summary <- read_csv(here::here(output_directory, file_name))
+```
+
+    ## Rows: 2 Columns: 7
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): diagnosis
+    ## dbl (6): min, mean, median, max, range, stdev
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+This allows me to check that the file has been written properly. I have
+read the fule and printed the contents.
+<!----------------------------------------------------------------------------->
+
+## 4.2 (3 points)
+
+Write your model object from Task 3 to an R binary file (an RDS), and
+load it again. Be sure to save the binary file in your `output` folder.
+Use the functions `saveRDS()` and `readRDS()`.
+
+- The same robustness and reproducibility criteria as in 4.1 apply here.
+
+<!-------------------------- Start your work below ---------------------------->
+
+``` r
+saveRDS(data_test, here::here("output", "data_test.RDS"))
+```
+
+``` r
+readRDS(here::here("output", "data_test.RDS"))
+```
+
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  radius_mean by diagnosis
+    ## t = -22.209, df = 289.71, p-value < 2.2e-16
+    ## alternative hypothesis: true difference in means between group B and group M is not equal to 0
+    ## 95 percent confidence interval:
+    ##  -5.787448 -4.845165
+    ## sample estimates:
+    ## mean in group B mean in group M 
+    ##        12.14652        17.46283
+
+After saving and reading the RDS files, we can see that it is the same
+model we made earlier. Therefore, the models have been properly written
+to the RDS files.
+<!----------------------------------------------------------------------------->
+
+# Overall Reproducibility/Cleanliness/Coherence Checklist
+
+Here are the criteria we’re looking for.
+
+## Coherence (0.5 points)
+
+The document should read sensibly from top to bottom, with no major
+continuity errors.
+
+The README file should still satisfy the criteria from the last
+milestone, i.e. it has been updated to match the changes to the
+repository made in this milestone.
+
+## File and folder structure (1 points)
+
+You should have at least three folders in the top level of your
+repository: one for each milestone, and one output folder. If there are
+any other folders, these are explained in the main README.
+
+Each milestone document is contained in its respective folder, and
+nowhere else.
+
+Every level-1 folder (that is, the ones stored in the top level, like
+“Milestone1” and “output”) has a `README` file, explaining in a sentence
+or two what is in the folder, in plain language (it’s enough to say
+something like “This folder contains the source for Milestone 1”).
+
+## Output (1 point)
+
+All output is recent and relevant:
+
+- All Rmd files have been `knit`ted to their output md files.
+- All knitted md files are viewable without errors on Github. Examples
+  of errors: Missing plots, “Sorry about that, but we can’t show files
+  that are this big right now” messages, error messages from broken R
+  code
+- All of these output files are up-to-date – that is, they haven’t
+  fallen behind after the source (Rmd) files have been updated.
+- There should be no relic output files. For example, if you were
+  knitting an Rmd to html, but then changed the output to be only a
+  markdown file, then the html file is a relic and should be deleted.
+
+Our recommendation: delete all output files, and re-knit each
+milestone’s Rmd file, so that everything is up to date and relevant.
+
+## Tagged release (0.5 point)
+
+You’ve tagged a release for Milestone 2.
+
+### Attribution
+
+Thanks to Victor Yuan for mostly putting this together.
