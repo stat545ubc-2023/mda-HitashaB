@@ -1,1 +1,3 @@
-This is the README file for Milestone 1. This contains an .rmd and .md file for the first milestone of the project. It also contains the file of all the graphs.
+## README Document for Output folder
+
+This is the README file for the output folder. This contains an .csv and RSD file for the summary table and modelling done in Milestone 2.
